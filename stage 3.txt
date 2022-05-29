@@ -1,0 +1,55 @@
+module stage_3(L2x1,L2x2,L2x3,L2x4,L3_x1,L3_x2,L3_x3,L3_x4,Clk,poly,poly_s3,In,In_s3);
+  input Clk;
+  input [31:0] L2x1, L2x2,L2x3, L2x4;
+  output reg[31:0] L3_x1, L3_x2,L3_x3,L3_x4;
+  input [31:0] poly;
+  output reg [31:0] poly_s3;
+  input [7:0] In;
+  output reg [7:0] In_s3;
+  
+  always @(posedge Clk)
+    begin 
+      L3_x1<=L2x1;
+      L3_x2<=L2x2;
+      L3_x3<=L2x3;
+      L3_x4<=L2x4;
+
+      poly_s3<=poly;// forwarding 
+      In_s3<=In; // forwarding In
+    end
+endmodule
+
+module TB_1();
+  reg clk=0;
+  reg [31:0] L2x1, L2x2,L2x3, L2x4;
+  wire[31:0] L3_x1, L3_x2,L3_x3,L3_x4;
+  reg [31:0] poly;
+  wire [31:0] poly_s3;
+  reg [7:0] In;
+  wire [7:0] In_s3;
+  
+  stage_3 s1(L2x1,L2x2,L2x3,L2x4,L3_x1,L3_x2,L3_x3,L3_x4,clk,poly,poly_s3,In,In_s3);
+  
+  always #1 clk = ~clk; 
+  initial 
+    begin 
+	  L2x1=32'h83C3C2FD;
+	  L2x2=32'h0A0A0D58;	
+	  L2x3=32'h00000000;	
+      L2x4=32'h0A0A0D58;      
+      poly=32'hffaaccee;
+      In=8'b11001110;
+    end
+  initial
+    begin 
+      #1 $display("input = %b  \n", In);
+      #1 $display("poly = %h  \n", poly_s3);
+
+      
+      #1 $display("L3_x1 = %h \nL3_x2= %h \nL3_x3= %h \nL3_x4 = %h" , L3_x1, L3_x2,L3_x3,L3_x4);
+
+      
+      #2 $finish;
+      
+    end
+endmodule
